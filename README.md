@@ -87,6 +87,12 @@ V17, V14, V12 and V10 are the most negatively correlated with fraud (about -0.33
 ### Hour of day (`hour_of_day.png`)
 Transaction volume is lowest overnight (hours ~2-5) and steady from ~9 to ~22. The fraud rate is the reverse: ~1.7% at hour 2 and ~1.0% at hour 4, versus roughly 0.05-0.2% during the day. Fraud is concentrated when few normal transactions occur.
 
+### Transaction amount by class (`amount_boxplot_by_class.png`)
+The boxplot compares `log1p(Amount)` for normal and fraud transactions to make the central distributions readable despite the right-skewed amounts. Individual outliers are hidden in the plot; the accompanying table reports the 25th, 50th, 75th, 95th and 99th percentiles using all transactions.
+
+### Fraud across two PCA features (`v14_v10_fraud_scatter.png`)
+The scatter plot shows every transaction across `V14` and `V10`, fading normal points and highlighting fraud. It illustrates how these important anonymized features relate to the labels, while making clear that overlap means the pair alone is not a complete detection rule.
+
 ### Precision-recall curves (`precision_recall_curves.png`)
 The random forest holds higher precision across most recall levels (PR AUC ~0.87 vs ~0.73), so it is the better model overall.
 
@@ -99,8 +105,14 @@ V14 is by far the most important feature for the random forest (~0.16), followed
 ### Threshold analysis (`threshold_analysis.png`)
 Raising the threshold increases precision and lowers recall. The random forest reaches its best F1 (~0.88) near a threshold of 0.31, better than at the default 0.5. Logistic regression's best F1 (~0.83) needs a very high threshold, showing its probabilities are poorly calibrated because of class weighting.
 
+### Top-K fraud capture (`top_k_fraud_capture.png`)
+This chart compares the share of test-set frauds captured when reviewing only the highest-scored transactions. At a 0.1% alert budget (57 transactions), the random forest captures 55 of 98 frauds (56.1%), versus 46 (46.9%) for logistic regression. At a 0.5% budget (285 transactions), they capture 88 (89.8%) and 87 (88.8%), respectively.
+
+### Probability calibration (`calibration_curves.png`)
+The calibration curve compares predicted probabilities with observed fraud frequencies in quantile bins; points nearer the diagonal are better calibrated. On this test split, the Brier scores are 0.000409 for the random forest, 0.023899 for logistic regression, and 0.001717 for a prevalence-only baseline (lower is better). Interpret Brier scores alongside the precision-recall and alert-capacity results because fraud is rare.
+
 > The numbers above come from the current data, split and models. Update them if any of those change.
 
 ## Possible next steps
 
-Stratified cross-validation, calibration curves, cost-based threshold selection using `Amount`, gradient boosting (XGBoost/LightGBM), Isolation Forest, and SMOTE or undersampling compared against class weights.
+Stratified cross-validation, cost-based threshold selection using `Amount`, gradient boosting (XGBoost/LightGBM), Isolation Forest, and SMOTE or undersampling compared against class weights.
